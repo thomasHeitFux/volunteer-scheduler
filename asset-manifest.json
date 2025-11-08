@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/volunteer-scheduler/static/css/main.5d9dc1bb.css",
-    "main.js": "/volunteer-scheduler/static/js/main.6e42e75c.js",
+    "main.js": "/volunteer-scheduler/static/js/main.f33f8341.js",
     "static/js/453.2f04ee73.chunk.js": "/volunteer-scheduler/static/js/453.2f04ee73.chunk.js",
     "index.html": "/volunteer-scheduler/index.html",
     "main.5d9dc1bb.css.map": "/volunteer-scheduler/static/css/main.5d9dc1bb.css.map",
-    "main.6e42e75c.js.map": "/volunteer-scheduler/static/js/main.6e42e75c.js.map",
+    "main.f33f8341.js.map": "/volunteer-scheduler/static/js/main.f33f8341.js.map",
     "453.2f04ee73.chunk.js.map": "/volunteer-scheduler/static/js/453.2f04ee73.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.5d9dc1bb.css",
-    "static/js/main.6e42e75c.js"
+    "static/js/main.f33f8341.js"
   ]
 }
