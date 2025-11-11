@@ -15,8 +15,8 @@ type Volunteer = VolunteerInput & { id: number };
 type Props = {
   onAdd: (v: VolunteerInput) => void;
   volunteers: Volunteer[];
-  presetBed?: number;        // 👈 NUEVO
-  presetDateISO?: string;    // 👈 NUEVO
+  presetBed?: number;        // NUEVO
+  presetDateISO?: string;    //  NUEVO
 };
 
 export default function AddVolunteerForm({

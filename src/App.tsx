@@ -31,7 +31,7 @@ function App() {
   const [popupDate, setPopupDate] = useState<string | undefined>(undefined);
 
   const [showAddPopup, setShowAddPopup] = useState(false);
-  const [showListPopup, setShowListPopup] = useState(false);
+
   const [editingVolunteer, setEditingVolunteer] = useState<Volunteer | null>(null);
   const [weekStart, setWeekStart] = useState<Date>(() => {
     const today = new Date();
@@ -153,7 +153,11 @@ function App() {
         </div>
       )}
 
-
+        <VolunteerList
+          volunteers={volunteers}
+          onRemove={removeVolunteer}
+          onEdit={(v) => setEditingVolunteer(v)}
+        />
 
       {/* Schedule */}
       <Schedule
@@ -201,11 +205,7 @@ function App() {
 
       <div className="p-4 space-y-6">
 
-        <VolunteerList
-          volunteers={volunteers}
-          onRemove={removeVolunteer}
-          onEdit={(v) => setEditingVolunteer(v)}
-        />
+      
       </div>
     </div>
   );
