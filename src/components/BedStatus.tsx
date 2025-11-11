@@ -1,19 +1,10 @@
 import React from "react";
-
+import { BED_COLORS } from "../constants/colors";
 interface Props {
   beds: (string | null)[];
 }
 
-const colors = [
-  "bg-red-600",
-  "bg-orange-500",
-  "bg-yellow-500",
-  "bg-green-500",
-  "bg-teal-500",
-  "bg-blue-500",
-  "bg-indigo-500",
-  "bg-purple-500",
-];
+const colors = BED_COLORS
 
 const BedStatus: React.FC<Props> = ({ beds }) => {
   return (

@@ -1,32 +1,16 @@
 import React, { useMemo } from "react";
-
-type Volunteer = {
-  id: number;
-  name: string;
-  bed: number;
-  startDate: string;
-  endDate: string;
-};
+import { Volunteer } from "../Types/volunteer";
+import { SHIFTS } from "../constants/shifts";
+import { BED_COLORS } from "../constants/colors";
 
 type Props = {
   volunteer: Volunteer;
   schedule: Record<string, Record<string, string>>;
 };
 
-const SHIFTS = [
-  { label: "Breakfast A", hours: "08:00 - 12:00" },
-  { label: "Breakfast B", hours: "09:00 - 13:00" },
-  { label: "Maintenance", hours: "09:00 - 13:00" },
-  { label: "Bar 1", hours: "18:00 - 22:00" },
-  { label: "Bar 2", hours: "19:00 - 23:00" },
-  { label: "Dinner", hours: "18:00 - 21:30" },
-];
 
-// mismos colores que el calendar
-const BED_COLORS = [
-  "#dc2626", "#f97316", "#eab308", "#22c55e",
-  "#14b8a6", "#3b82f6", "#6366f1", "#a855f7",
-];
+
+
 
 export default function VolunteerSchedule({ volunteer, schedule }: Props) {
   // Filtramos los días donde el voluntario aparece en el schedule

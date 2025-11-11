@@ -1,31 +1,24 @@
+// src/components/Calendar.tsx
 import React, { useState } from "react";
-
-type Volunteer = {
-  id: number;
-  name: string;
-  bed: number;
-  startDate: string;
-  endDate: string;
-};
+import { BED_COLORS } from "../constants/colors";
+import { Volunteer } from "../Types/volunteer";
 
 type Props = {
   year: number;
   volunteers: Volunteer[];
   onEdit?: (vol: Volunteer) => void;
+  // 👇 NUEVO: App controla el popup
+  onRequestAdd?: (bed: number, dateISO: string) => void;
 };
 
-const BED_COLORS = [
-  "#dc2626", "#f97316", "#eab308", "#22c55e",
-  "#14b8a6", "#3b82f6", "#6366f1", "#a855f7",
-];
+const COLORS = BED_COLORS;
 
-// ✅ Normaliza cualquier fecha ISO o string a solo "año-mes-día" (sin hora)
 const normalizeDate = (str: string) => {
   const d = new Date(str);
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 };
 
-export default function Calendar({ year, volunteers, onEdit }: Props) {
+export default function Calendar({ year, volunteers, onEdit, onRequestAdd }: Props) {
   const [month, setMonth] = useState(new Date().getMonth());
   const [yearState, setYearState] = useState(year);
 
@@ -54,7 +47,6 @@ export default function Calendar({ year, volunteers, onEdit }: Props) {
     }
   };
 
-  // ✅ Determina si un voluntario está ocupando una cama en un día
   const getVolunteerForDay = (bed: number, day: number) => {
     const current = new Date(yearState, month, day);
     return volunteers.find((v) => {
@@ -64,115 +56,119 @@ export default function Calendar({ year, volunteers, onEdit }: Props) {
     });
   };
 
-  // ✅ Solo mostrar el nombre el primer día visible
-  const showName = (vol: Volunteer, day: number) => {
+  const isStartDay = (vol: Volunteer, day: number) => {
     const start = normalizeDate(vol.startDate);
-
-    // empieza este mes → mostrar en el día exacto
+    const current = new Date(yearState, month, day);
     if (
-      start.getFullYear() === yearState &&
-      start.getMonth() === month &&
-      start.getDate() === day
-    )
-      return true;
-
-    // empezó antes del mes → mostrar en el día 1
+      start.getFullYear() === current.getFullYear() &&
+      start.getMonth() === current.getMonth() &&
+      start.getDate() === current.getDate()
+    ) return true;
     if (start < new Date(yearState, month, 1) && day === 1) return true;
+    return false;
+  };
 
+  const isEndDay = (vol: Volunteer, day: number) => {
+    const end = normalizeDate(vol.endDate);
+    const current = new Date(yearState, month, day);
+    if (
+      end.getFullYear() === current.getFullYear() &&
+      end.getMonth() === current.getMonth() &&
+      end.getDate() === current.getDate()
+    ) return true;
+    if (end > new Date(yearState, month, daysInMonth) && day === daysInMonth) return true;
     return false;
   };
 
   return (
-    <div className="overflow-x-auto mt-4 border border-gray-700 rounded-lg">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-2 px-4 py-2 bg-gray-800 rounded-t-lg">
-        <button
-          onClick={goPrevMonth}
-          className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600 text-white"
-        >
-          {"<"} Prev
+    <div className="mt-4 rounded-xl border border-gray-700 bg-gray-900/60 shadow-lg overflow-hidden">
+      {/* header */}
+      <div className="flex items-center justify-between px-5 py-3 bg-gradient-to-r from-slate-900 to-slate-800 border-b border-slate-700">
+        <button onClick={goPrevMonth} className="px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700 rounded-md text-sm text-white">
+          ← Prev
         </button>
-
-        <h2 className="text-2xl font-bold text-gray-200">
-          {monthName} {yearState}
-        </h2>
-
-        <button
-          onClick={goNextMonth}
-          className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600 text-white"
-        >
-          Next {">"}
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-100 capitalize">
+            {monthName} {yearState}
+          </h2>
+          <p className="text-xs text-gray-400">Beds occupancy overview</p>
+        </div>
+        <button onClick={goNextMonth} className="px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700 rounded-md text-sm text-white">
+          Next →
         </button>
       </div>
 
-      {/* Tabla */}
-      <table className="min-w-max border-collapse text-center">
-        <thead>
-          <tr className="bg-gray-800 text-gray-300">
-            <th className="border border-gray-700 px-4 py-3 rounded-tl-lg">
-              Bed
-            </th>
-            {Array.from({ length: daysInMonth }, (_, i) => (
-              <th key={i} className="border border-gray-700 px-3 py-3">
-                {i + 1}
+      <div className="overflow-x-auto">
+        <table className="min-w-max text-center text-sm">
+          <thead>
+            <tr className="bg-slate-900">
+              <th className="sticky left-0 z-10 bg-slate-900 border-b border-slate-700 px-4 py-3 text-left text-xs uppercase tracking-wide text-slate-300">
+                Bed
               </th>
-            ))}
-          </tr>
-        </thead>
-
-        <tbody>
-          {beds.map((bed) => (
-            <tr key={bed}>
-              <td
-                className="border border-gray-700 px-4 py-3 font-bold text-white"
-                style={{ backgroundColor: BED_COLORS[bed - 1] }}
-              >
-                Bed {bed}
-              </td>
-
-              {Array.from({ length: daysInMonth }, (_, i) => {
-                const day = i + 1;
-                const vol = getVolunteerForDay(bed, day);
-
-                return (
-                  <td
-                    key={i}
-                    className="border border-gray-700 px-1 py-3 text-white relative cursor-pointer"
-                    style={{
-                      backgroundColor: vol ? BED_COLORS[vol.bed - 1] : "#111827",
-                    }}
-                    title={
-                      vol
-                        ? `${vol.name} — ${vol.startDate.split("T")[0]} → ${
-                            vol.endDate.split("T")[0]
-                          }`
-                        : ""
-                    }
-                    onClick={() => vol && onEdit && onEdit(vol)}
-                  >
-                    {vol && (
-                      <span
-                        style={{
-                          position: "absolute",
-                          left: 0,
-                          top: 0,
-                          bottom: 0,
-                          width: "6px",
-                          borderRadius: "4px",
-                          backgroundColor: BED_COLORS[vol.bed - 1],
-                        }}
-                      />
-                    )}
-                    <div style={{ marginLeft: "10px", fontWeight: 600 }}>
-                      {vol && showName(vol, day) ? vol.name : ""}
-                    </div>
-                  </td>
-                );
-              })}
+              {Array.from({ length: daysInMonth }, (_, i) => (
+                <th key={i} className="border-b border-slate-700 px-3 py-3 text-xs text-slate-300">
+                  {i + 1}
+                </th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {beds.map((bed) => (
+              <tr key={bed}>
+                <td
+                  className="sticky left-0 z-10 px-4 py-3 text-left font-semibold text-white border-r border-slate-800"
+                  style={{ backgroundColor: COLORS[bed - 1] }}
+                >
+                  Bed {bed}
+                </td>
+
+                {Array.from({ length: daysInMonth }, (_, i) => {
+                  const day = i + 1;
+                  const vol = getVolunteerForDay(bed, day);
+                  const baseColor = vol ? COLORS[vol.bed - 1] : undefined;
+                  const start = vol ? isStartDay(vol, day) : false;
+                  const end = vol ? isEndDay(vol, day) : false;
+                  const dateISO = new Date(yearState, month, day).toISOString().split("T")[0];
+
+                  return (
+                    <td
+                      key={i}
+                      className="relative py-3 border-b border-slate-800/40 border-r border-slate-800/10 min-w-[39px] bg-slate-900 cursor-pointer"
+                      onClick={() => {
+                        if (vol) {
+                          onEdit && onEdit(vol);
+                        } else {
+                          // 👇 avisamos al App
+                          onRequestAdd && onRequestAdd(bed, dateISO);
+                        }
+                      }}
+                    >
+                      {vol && (
+                        <div
+                          className="h-6 w-full"
+                          style={{
+                            backgroundColor: baseColor,
+                            borderTopLeftRadius: start ? "9999px" : 0,
+                            borderBottomLeftRadius: start ? "9999px" : 0,
+                            borderTopRightRadius: end ? "9999px" : 0,
+                            borderBottomRightRadius: end ? "9999px" : 0,
+                          }}
+                        >
+                          {start && (
+                            <span className="pl-2 pr-3 text-sm font-semibold text-white leading-6">
+                              {vol.name}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// src/components/AddVolunteerForm.tsx
+import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -14,29 +15,49 @@ type Volunteer = VolunteerInput & { id: number };
 type Props = {
   onAdd: (v: VolunteerInput) => void;
   volunteers: Volunteer[];
+  presetBed?: number;        // 👈 NUEVO
+  presetDateISO?: string;    // 👈 NUEVO
 };
 
-export default function AddVolunteerForm({ onAdd, volunteers }: Props) {
+export default function AddVolunteerForm({
+  onAdd,
+  volunteers,
+  presetBed,
+  presetDateISO,
+}: Props) {
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+
+  // cuando viene del calendario, prellenamos
+  useEffect(() => {
+    if (presetDateISO) {
+      const d = new Date(presetDateISO);
+      setStartDate(d);
+      setEndDate(d);
+    }
+  }, [presetDateISO]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!startDate || !endDate) return;
 
-    // Buscar la primera cama libre
-    let assignedBed: number | null = null;
-    for (let bed = 1; bed <= 8; bed++) {
-      const conflict = volunteers.some(
-        (v) =>
-          v.bed === bed &&
-          new Date(v.startDate) <= endDate &&
-          new Date(v.endDate) >= startDate
-      );
-      if (!conflict) {
-        assignedBed = bed;
-        break;
+    // si vino cama fija desde el calendario, usamos esa
+    let assignedBed: number | null = presetBed ?? null;
+
+    // si NO vino cama fija, usamos tu lógica de buscar libre
+    if (!assignedBed) {
+      for (let bed = 1; bed <= 8; bed++) {
+        const conflict = volunteers.some(
+          (v) =>
+            v.bed === bed &&
+            new Date(v.startDate) <= endDate &&
+            new Date(v.endDate) >= startDate
+        );
+        if (!conflict) {
+          assignedBed = bed;
+          break;
+        }
       }
     }
 
@@ -84,7 +105,6 @@ export default function AddVolunteerForm({ onAdd, volunteers }: Props) {
           selectsEnd
           startDate={startDate}
           endDate={endDate}
-          
           placeholderText="Check-out"
           className="p-2 rounded bg-gray-800 text-white w-full"
           required

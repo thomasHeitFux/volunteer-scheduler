@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import AddVolunteerForm from "./components/AddVolunteerForm";
 import Calendar from "./components/Calendar";
 import VolunteerList from "./components/VolunteerList";
-import Schedule from "./components/Schedule";
+import Schedule from "./components/schedule/Schedule";
 import EditVolunteerForm from "./components/EditVolunteerForm";
 import LoginJSONBin from "./components/LoginJSONBin";
 import WeeklyGrid from "./components/WeeklyGrid";
+
 
 
 export type VolunteerInput = {
@@ -25,6 +26,9 @@ function App() {
   const [schedule, setSchedule] = useState<Record<string, Record<string, string[]>>>({});
 
   const [nextId, setNextId] = useState(1);
+  // dentro de App.tsx
+  const [popupBed, setPopupBed] = useState<number | undefined>(undefined);
+  const [popupDate, setPopupDate] = useState<string | undefined>(undefined);
 
   const [showAddPopup, setShowAddPopup] = useState(false);
   const [showListPopup, setShowListPopup] = useState(false);
@@ -107,7 +111,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 p-8 font-sans">
-      <h1 className="text-4xl font-bold mb-4 text-indigo-400">Volunteer Scheduler</h1>
+      <h1 className="text-4xl  mb-4 text-indigo-100">Volunteer Scheduler</h1>
       <button
         onClick={() => {
           localStorage.removeItem("auth");
@@ -125,12 +129,7 @@ function App() {
         >
           Add Volunteer
         </button>
-        <button
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded"
-          onClick={() => setShowListPopup(true)}
-        >
-          Volunteers List
-        </button>
+        
       </div>
 
       {/* Pop-up agregar */}
@@ -138,7 +137,12 @@ function App() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-gray-800 p-6 rounded-lg w-80">
             <h2 className="text-xl font-bold mb-4 text-white">Add volunteer</h2>
-            <AddVolunteerForm onAdd={addVolunteer} volunteers={volunteers} />
+            <AddVolunteerForm
+              onAdd={addVolunteer}
+              volunteers={volunteers}
+              presetBed={popupBed}
+              presetDateISO={popupDate}
+            />
             <button
               className="mt-2 w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded"
               onClick={() => setShowAddPopup(false)}
@@ -149,19 +153,9 @@ function App() {
         </div>
       )}
 
-      {/* Lista */}
-      {showListPopup && (
-        <VolunteerList
-          volunteers={volunteers}
-          onRemove={removeVolunteer}
-          onEdit={(v) => {
-            setEditingVolunteer(v);
-            setShowListPopup(false);
-          }}
-          onClose={() => setShowListPopup(false)}
-        />
-      )}
-  {/* Schedule */}
+
+
+      {/* Schedule */}
       <Schedule
         volunteers={volunteers}
         schedule={schedule}
@@ -179,8 +173,17 @@ function App() {
       <Calendar
         year={2025}
         volunteers={volunteers}
-        onEdit={(vol) => setEditingVolunteer(vol)}
+        onEdit={(v) => {
+          setEditingVolunteer(v);
+          // o lo que ya tengas
+        }}
+        onRequestAdd={(bed, dateISO) => {
+          setPopupBed(bed);
+          setPopupDate(dateISO);
+          setShowAddPopup(true);   // 👈 abre tu popup de siempre
+        }}
       />
+
 
       {/* Editar voluntario */}
       {editingVolunteer && (
@@ -196,8 +199,14 @@ function App() {
         </div>
       )}
 
-    
+      <div className="p-4 space-y-6">
 
+        <VolunteerList
+          volunteers={volunteers}
+          onRemove={removeVolunteer}
+          onEdit={(v) => setEditingVolunteer(v)}
+        />
+      </div>
     </div>
   );
 }

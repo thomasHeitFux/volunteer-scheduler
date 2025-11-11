@@ -1,12 +1,7 @@
 import React, { useMemo } from "react";
+import { Volunteer } from "../Types/volunteer";
+import { SHIFTS } from "../constants/shifts";
 
-export type Volunteer = {
-  id: number;
-  name: string;
-  bed: number;
-  startDate: string;
-  endDate: string;
-};
 
 type Props = {
   volunteers: Volunteer[];
@@ -14,14 +9,7 @@ type Props = {
   weekStart: Date; // 🔹 viene desde App (sincronizado con Schedule)
 };
 
-const SHIFTS = [
-  { label: "Breakfast A", hours: "08:00 - 12:00" },
-  { label: "Breakfast B", hours: "09:00 - 13:00" },
-  { label: "Maintenance", hours: "09:00 - 13:00" },
-  { label: "Bar 1", hours: "08:00 - 12:00" },
-  { label: "Bar 2", hours: "18:00 - 22:00" },
-  { label: "Dinner", hours: "18:00 - 21:30" },
-];
+
 
 
 const dateToISO = (d: Date) => d.toISOString().split("T")[0];

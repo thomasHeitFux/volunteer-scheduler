@@ -1,0 +1,47 @@
+export const LANGUAGE_GROUPS = [
+  {
+    label: "Global",
+    keys: ["English", "Spanish", "Portuguese", "French", "German", "Italian"],
+  },
+  {
+    label: "Europe",
+    keys: [
+      "Polish",
+      "Romanian",
+      "Dutch",
+      "Danish",
+      "Swedish",
+      "Norwegian",
+      "Finnish",
+      "Czech",
+      "Slovak",
+      "Hungarian",
+      "Greek",
+      "Bulgarian",
+      "Serbian",
+      "Croatian",
+      "Ukrainian",
+      "Russian",
+    ],
+  },
+  {
+    label: "South America",
+    keys: ["Quechua", "Guarani"],
+  },
+  {
+    label: "Asia / Middle East",
+    keys: [
+      "Arabic",
+      "Hebrew",
+      "Turkish",
+      "Hindi",
+      "Chinese",
+      "Japanese",
+      "Korean",
+      "Thai",
+      "Vietnamese",
+      "Indonesian",
+      "Filipino",
+    ],
+  },
+];
